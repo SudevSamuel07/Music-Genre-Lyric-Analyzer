@@ -8,7 +8,7 @@ import whisper # New import for transcription
 
 
 
-# Path to the JSON file that stores MFCCs and genre labels
+# Path to the JSON file that stores MFCCs and genre 
 DATA_PATH = "data.json"
 # Path to save/load the trained model
 MODEL_PATH = "genre_classifier.h5"
