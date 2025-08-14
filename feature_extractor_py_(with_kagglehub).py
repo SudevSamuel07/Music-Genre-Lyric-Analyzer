@@ -6,8 +6,6 @@ from sklearn.model_selection import train_test_split
 import librosa
 import whisper # New import for transcription
 
-# --- Global Paths and Parameters ---
-
 # Path to the JSON file that stores MFCCs and genre labels
 DATA_PATH = "data.json"
 # Path to save/load the trained model
