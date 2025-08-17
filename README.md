@@ -18,99 +18,89 @@ Self-Contained Script: A single Python script handles data preprocessing, model 
 
 How It Works
 The project follows a two-pronged approach to analyze an audio file:
+Music Genre Classification and Lyric Transcription (Web App)
 
-1. Genre Classification (Music Information Retrieval)
-This part of the project answers the question: "What does the music sound like?"
+This project analyzes an audio file and returns two results:
 
-Feature Extraction: The audio signal is loaded and processed using the librosa library. It's converted into a series of MFCC spectrograms, which are visual representations of the audio's timbre and frequency.
+- Predicted music genre (using a CNN trained on MFCC features)
+- Transcribed lyrics (using OpenAI Whisper)
 
-Model Training: A CNN is trained on thousands of these MFCC "images" from the GTZAN dataset. The model learns to recognize the unique visual patterns associated with each of the 10 different music genres.
+Recent changes
+- A minimal Flask web application was added to provide a simple UI and HTTP endpoint for analysis.
+- New files: `app.py`, `features.py`, `templates/index.html`, and `requirements.txt`.
 
-Prediction: For a new song, its MFCCs are generated and fed into the trained CNN, which predicts the most likely genre.
+Files of interest
+- `app.py` — Flask app that serves the web UI and an `/analyze` endpoint.
+- `features.py` — audio feature extraction, model loading, genre prediction, and Whisper transcription helpers.
+- `templates/index.html` — simple web UI (upload or provide URL).
+- `genre_classifier.h5` — pretrained Keras model (binary, must be present to predict).
+- `data.json` — dataset metadata (mapping of class indices to genre names). Required by `features`.
 
-2. Lyric Transcription (Natural Language Processing)
-This part of the project answers the question: "What are the lyrics about?"
+Requirements
+- Python 3.8+ (project was developed and tested with Python 3.10–3.13)
+- FFmpeg (must be installed and on PATH for Whisper to decode many audio formats)
 
-ASR Model: The project uses OpenAI's Whisper, a pre-trained model designed for robust Automatic Speech Recognition (ASR).
+Install
 
-Transcription: The Whisper model processes the raw audio waveform of the song and converts the sung vocals into a text string, providing the song's lyrics.
+1. Create and activate a virtual environment:
 
-Technology Stack
-Dataset
-GTZAN Genre Collection: A popular benchmark dataset consisting of 1,000 audio tracks, each 30 seconds long, covering 10 music genres.
-
-Software and Libraries
-Python 3.x
-
-TensorFlow / Keras: For building and training the CNN model for genre classification.
-
-Librosa: For audio processing and extracting MFCC features.
-
-OpenAI Whisper: For transcribing audio to text.
-
-scikit-learn: For splitting the dataset into training and testing sets.
-
-NumPy: For numerical operations.
-
-Matplotlib: For plotting the model's training history.
-
-FFmpeg: A command-line tool required by Whisper for audio/video processing.
-
-Setup and Installation
-Follow these steps to set up the project on your local machine.
-
-Clone the repository:
-
-git clone <your-repository-url>
-cd <your-repository-name>
-
-Create a Python virtual environment (recommended):
-
+```powershell
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+venv\Scripts\Activate.ps1    # Windows PowerShell
+```
 
-Install the required Python libraries:
+2. Install Python dependencies:
 
-pip install tensorflow numpy scikit-learn matplotlib librosa
-pip install git+[https://github.com/openai/whisper.git](https://github.com/openai/whisper.git)
+```powershell
+pip install --upgrade pip
+pip install -r requirements.txt
+```
 
-Install FFmpeg:
+Note: `requirements.txt` installs `tensorflow`, `librosa`, and Whisper (via Git). Whisper and TensorFlow are large; installation may take time.
 
-On macOS (using Homebrew):
+Run the web app
 
-brew install ffmpeg
+```powershell
+# from project root
+python app.py
+```
 
-On Debian/Ubuntu:
+The app starts on http://localhost:5000. Use the web form to upload an audio file or paste a direct URL to an audio file (mp3, wav, m4a, flac, ogg).
 
-sudo apt update && sudo apt install ffmpeg
+How it works (brief)
+- The app extracts MFCC segments from the input audio (`features.process_audio`) and feeds them to the pre-trained Keras model (`genre_classifier.h5`) for per-segment predictions. A majority vote produces the final genre.
+- Whisper is used to transcribe the audio. The code now validates audio content and uses `whisper.load_audio` + `whisper.pad_or_trim` to avoid zero-length tensor errors.
 
-On Windows: Download the binaries from the official website and add the bin folder to your system's PATH.
+Notes & troubleshooting
+- Ensure `genre_classifier.h5` and `data.json` are present in the project root. The web UI will return a friendly error if the model or mapping is missing.
+- Whisper requires FFmpeg. On Windows, download FFmpeg and add its `bin` directory to your PATH.
+- If you get an error like "Loaded audio is empty (ffmpeg/decoder likely failed)", try converting the file with ffmpeg and re-uploading:
 
-Download the Dataset:
+```powershell
+ffmpeg -y -i "uploads\input.mp3" -ar 16000 -ac 1 "uploads\input_conv.wav"
+```
 
-Download the GTZAN dataset from Kaggle.
+- If you run the Flask app under the VS Code debugger, the built-in reloader can raise SystemExit in the parent process. The app disables the reloader when started via `app.py` to avoid this problem.
 
-Extract the archive and place the genres_original folder inside a Data directory in the root of the project.
+- If TensorFlow or protobuf emits many warnings at startup, they are usually informational. To reduce noise for development you can set environment variables before running the app:
 
-Usage
-The project is structured to run in two main phases from a single script.
+```powershell
+$env:TF_CPP_MIN_LOG_LEVEL = "2"
+$env:TF_ENABLE_ONEDNN_OPTS = "0"
+python app.py
+```
 
-Phase 1: Data Preprocessing and Model Training
+Development notes
+- The app currently expects a pre-trained `genre_classifier.h5`. The original ETL/training script in the repo can generate `data.json` and train a model if you prefer to retrain — training can be slow and memory intensive.
+- The transcription step loads a Whisper model (by default `base`) which can be slow to load; subsequent requests are faster once the model is cached in memory.
 
-First, you need to generate the data.json file from the GTZAN dataset.
+Next improvements you might consider
+- Add an API JSON endpoint for programmatic use.
+- Add background processing (Celery/RQ) to avoid long request timeouts for Whisper on large inputs.
+- Add a small test that runs inference on a bundled short audio sample.
 
-Then, the script will automatically train the genre classification model and save it as genre_classifier.h5.
+License & credits
+- Uses GTZAN dataset (if you train) and OpenAI Whisper for ASR.
 
-Phase 2: Analysis of a New Song
-
-After training, the script will load the saved model.
-
-It will then analyze the audio file specified by the AUDIO_PATH variable in the script.
-
-Finally, it will print the predicted genre and the transcribed lyrics.
-
-To run the entire pipeline, simply execute the main Python script:
-
-python your_script_name.py
-
-Note: The first run will take a significant amount of time due to data preprocessing and model training. Subsequent runs will be much faster as they can load the pre-trained model.
+---
+If you need me to update the README further (add screenshots, deployment steps, or an API reference), tell me what to include.
