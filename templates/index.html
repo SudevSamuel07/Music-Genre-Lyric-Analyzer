@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Music Genre + Lyrics Analyzer</title>
+    <style>
+      body { font-family: Arial, sans-serif; max-width:800px; margin:40px auto; }
+      label { display:block; margin-top:12px }
+      textarea { width:100%; height:200px }
+      .error { color:darkred }
+      .box { padding:12px; border:1px solid #ddd; border-radius:6px }
+    </style>
+  </head>
+  <body>
+    <h1>Music Genre & Lyrics Analyzer</h1>
+    <p>Upload an audio file or paste a direct URL to an audio file (mp3, wav, m4a, ogg, flac).</p>
+
+    {% if error %}
+      <div class="error">{{ error }}</div>
+    {% endif %}
+
+    <form action="/analyze" method="post" enctype="multipart/form-data" class="box">
+      <label>Upload file</label>
+      <input type="file" name="file">
+
+      <label>Or provide direct URL to audio</label>
+      <input type="text" name="url" style="width:100%" placeholder="https://example.com/song.mp3">
+
+      <div style="margin-top:12px">
+        <button type="submit">Analyze</button>
+      </div>
+    </form>
+
+    {% if result %}
+      <h2>Results</h2>
+      <div class="box">
+        <p><strong>Predicted Genre:</strong> {{ genre }}</p>
+        <p><strong>Transcribed Lyrics:</strong></p>
+        <textarea readonly>{{ transcription }}</textarea>
+      </div>
+    {% endif %}
+
+    <hr>
+    <small>Note: Whisper and TensorFlow models are large; first request may take a while while models load. This demo expects a pre-trained 'genre_classifier.h5' and a 'data.json' mapping in the project root.</small>
+  </body>
+</html>
