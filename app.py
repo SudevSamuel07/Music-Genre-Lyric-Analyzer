@@ -2,7 +2,7 @@ import os
 import tempfile
 import requests
 from flask import Flask, render_template, request, redirect, url_for
-from werkzeug.utils import secure_filename             
+from werkzeug.utils import secure_filename
 
 from features import process_audio, load_keras_model, load_genre_mapping, predict_genre, transcribe_audio_whisper
 
