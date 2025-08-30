@@ -1,5 +1,6 @@
 Music Genre Classification and Lyric Transcription
 
+
 This project is a deep learning application that analyzes an audio file to perform two main tasks:
 
 Music Genre Classification: It identifies the genre of the music (e.g., Pop, Rock, Classical) by analyzing its sound features.
