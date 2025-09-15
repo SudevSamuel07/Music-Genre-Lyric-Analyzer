@@ -7,7 +7,12 @@
 
 Instructions for installing the project.
 
-## Usage
+### Core Functionality
+- **Multi-format Audio Support**: Handles MP3, WAV, M4A, FLAC, and OGG files
+- **Dual Input Methods**: Upload files directly or provide URLs to remote audio files
+- **Real-time Analysis**: Instant genre prediction and lyrics transcription
+- **Web Interface**: User-friendly Flask-based web application
+- **Robust Error Handling**: Comprehensive validation and user-friendly error messages
 
 ### Technical Features
 - **CNN-based Genre Classification**: Uses MFCC (Mel-Frequency Cepstral Coefficients) feature extraction
