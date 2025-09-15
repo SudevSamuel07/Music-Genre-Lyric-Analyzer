@@ -1,7 +1,6 @@
 # Music Genre & Lyrics Analyzer
 
-- Genre detection
-- Lyric analysis
+A comprehensive music analysis web application that combines machine learning and AI to provide dual insights into audio files:
 
 ## Installation
 
