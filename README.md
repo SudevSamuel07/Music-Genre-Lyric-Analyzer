@@ -1,7 +1,5 @@
 # Music Genre Lyric Analyzer
 This is a project that analyzes song lyrics based on their genre.
-
-
 ## Features
 
 - Genre detection
