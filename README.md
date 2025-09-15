@@ -2,7 +2,8 @@
 
 A comprehensive music analysis web application that combines machine learning and AI to provide dual insights into audio files:
 
-## Installation
+- **Genre Classification**: Uses a Convolutional Neural Network (CNN) trained on MFCC features to predict music genres
+- **Lyrics Transcription**: Leverages OpenAI's Whisper model for accurate speech-to-text conversion of song vocals
 
 Instructions for installing the project.
 
