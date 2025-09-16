@@ -1,8 +1,5 @@
 # Music Genre & Lyrics Analyzer
 
-
-
-
 A comprehensive music analysis web application that combines machine learning and AI to provide dual insights into audio files:
 
 - **Genre Classification**: Uses a Convolutional Neural Network (CNN) trained on MFCC features to predict music genres
